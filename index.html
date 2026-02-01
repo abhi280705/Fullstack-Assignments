@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Product Page</title>
+  <style>
+    body {
+      font-family: Arial;
+      margin: 20px;
+    }
+
+    select {
+      margin-right: 10px;
+      padding: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #eee;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Product Listing Page</h2>
+
+  <!-- Controls -->
+  <label>Sort By:</label>
+  <select id="sort">
+    <option value="">None</option>
+    <option value="price-asc">Price Low to High</option>
+    <option value="price-desc">Price High to Low</option>
+    <option value="name-asc">Name A-Z</option>
+    <option value="name-desc">Name Z-A</option>
+    <option value="rating-asc">Rating Low to High</option>
+    <option value="rating-desc">Rating High to Low</option>
+  </select>
+
+  <label>Category:</label>
+  <select id="filter">
+    <option value="all">All</option>
+    <option value="Electronics">Electronics</option>
+    <option value="Clothing">Clothing</option>
+    <option value="Books">Books</option>
+    <option value="Home">Home</option>
+  </select>
+
+  <!-- Product Table -->
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Rating</th>
+        <th>Category</th>
+      </tr>
+    </thead>
+    <tbody id="products"></tbody>
+  </table>
+
+  <script>
+    const data = [
+      {name:"Phone", price:12000, rating:4.5, category:"Electronics"},
+      {name:"Laptop", price:50000, rating:4.7, category:"Electronics"},
+      {name:"Headphones", price:2000, rating:4.1, category:"Electronics"},
+      {name:"Camera", price:35000, rating:4.6, category:"Electronics"},
+      {name:"Smartwatch", price:8000, rating:4.0, category:"Electronics"},
+
+      {name:"T-Shirt", price:600, rating:4.2, category:"Clothing"},
+      {name:"Jeans", price:1800, rating:4.4, category:"Clothing"},
+      {name:"Jacket", price:3000, rating:4.5, category:"Clothing"},
+      {name:"Shoes", price:2500, rating:4.3, category:"Clothing"},
+      {name:"Cap", price:400, rating:3.9, category:"Clothing"},
+
+      {name:"Novel", price:450, rating:4.6, category:"Books"},
+      {name:"Textbook", price:1200, rating:4.8, category:"Books"},
+      {name:"Comics", price:300, rating:4.1, category:"Books"},
+      {name:"Biography", price:600, rating:4.4, category:"Books"},
+      {name:"Magazine", price:200, rating:3.8, category:"Books"},
+
+      {name:"Chair", price:2000, rating:4.0, category:"Home"},
+      {name:"Table", price:5000, rating:4.3, category:"Home"},
+      {name:"Lamp", price:1500, rating:4.1, category:"Home"},
+      {name:"Curtains", price:1200, rating:4.2, category:"Home"},
+      {name:"Sofa", price:25000, rating:4.6, category:"Home"}
+    ];
+
+    const tableBody = document.getElementById("products");
+    const sortSelect = document.getElementById("sort");
+    const filterSelect = document.getElementById("filter");
+
+    function displayProducts(list) {
+      tableBody.innerHTML = "";
+      list.forEach(p => {
+        const row = `
+          <tr>
+            <td>${p.name}</td>
+            <td>${p.price}</td>
+            <td>${p.rating}</td>
+            <td>${p.category}</td>
+          </tr>
+        `;
+        tableBody.innerHTML += row;
+      });
+    }
+
+    function updateProducts() {
+      let list = [...data];
+
+      if (filterSelect.value !== "all") {
+        list = list.filter(p => p.category === filterSelect.value);
+      }
+
+      const sortValue = sortSelect.value;
+      if (sortValue !== "") {
+        const parts = sortValue.split("-");
+        const key = parts[0];
+        const order = parts[1];
+
+        list.sort((a, b) => {
+          if (key === "name") {
+            return order === "asc"
+              ? a.name.localeCompare(b.name)
+              : b.name.localeCompare(a.name);
+          } else {
+            return order === "asc"
+              ? a[key] - b[key]
+              : b[key] - a[key];
+          }
+        });
+      }
+
+      displayProducts(list);
+    }
+
+    sortSelect.addEventListener("change", updateProducts);
+    filterSelect.addEventListener("change", updateProducts);
+
+    displayProducts(data);
+  </script>
+
+</body>
+</html>
