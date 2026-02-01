@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SVG Drawing Pad</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+      gap: 10px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 1px solid #333;
+      background-color: #f4f4f4;
+    }
+
+    button:hover {
+      background-color: #ddd;
+    }
+
+    svg {
+      border: 2px solid #333;
+      background-color: #fff;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <button id="clearBtn"> Delete Drawing</button>
+  </div>
+
+  <!-- SVG Drawing Area -->
+  <svg id="drawingArea" width="600" height="400"></svg>
+
+  <script>
+    const svg = document.getElementById("drawingArea");
+    const clearBtn = document.getElementById("clearBtn");
+
+    let isDrawing = false;
+    let currentPolyline = null;
+
+    // Convert mouse position to SVG coordinates
+    function getMousePosition(event) {
+      const rect = svg.getBoundingClientRect();
+      return {
+        x: event.clientX - rect.left,
+        y: event.clientY - rect.top
+      };
+    }
+
+    // Start drawing
+    svg.addEventListener("mousedown", (event) => {
+      isDrawing = true;
+
+      const { x, y } = getMousePosition(event);
+
+      currentPolyline = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline"
+      );
+
+      currentPolyline.setAttribute("points", `${x},${y}`);
+      currentPolyline.setAttribute("fill", "none");
+      currentPolyline.setAttribute("stroke", "black");
+      currentPolyline.setAttribute("stroke-width", "2");
+      currentPolyline.setAttribute("stroke-linecap", "round");
+      currentPolyline.setAttribute("stroke-linejoin", "round");
+
+      svg.appendChild(currentPolyline);
+    });
+
+    // Draw while moving
+    svg.addEventListener("mousemove", (event) => {
+      if (!isDrawing) return;
+
+      const { x, y } = getMousePosition(event);
+      const points = currentPolyline.getAttribute("points");
+
+      currentPolyline.setAttribute("points", points + ` ${x},${y}`);
+    });
+
+    // Stop drawing
+    function stopDrawing() {
+      isDrawing = false;
+      currentPolyline = null;
+    }
+
+    svg.addEventListener("mouseup", stopDrawing);
+    svg.addEventListener("mouseleave", stopDrawing);
+
+    // Clear all drawings
+    clearBtn.addEventListener("click", () => {
+      while (svg.firstChild) {
+        svg.removeChild(svg.firstChild);
+      }
+    });
+  </script>
+
+</body>
+</html>
